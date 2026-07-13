@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOOPS HAVOC — 20-Question Basketball Trivia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Semi+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --arena:#0B0E13;
+  --panel:#151A22;
+  --panel2:#1C2330;
+  --line:#2A3342;
+  --flood:#F4F1E6;
+  --dim:#93A0B4;
+  --amber:#FFC53D;
+  --amber-hot:#FFAA00;
+  --green:#3DDC84;
+  --red:#FF4757;
+  --f1:#E10600;
+  --nfl:#2E6BFF;
+  --nba:#FF7A00;
+  --cfb:#9C1D2E;
+  --cbb:#1FA7A0;
+  --nascar:#FFD320;
+  --golf:#3E9B4F;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--arena);
+  color:var(--flood);
+  font-family:'Barlow Semi Condensed',Arial,sans-serif;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(1200px 500px at 50% -10%, rgba(255,197,61,.10), transparent 60%),
+    radial-gradient(800px 400px at 10% 110%, rgba(46,107,255,.07), transparent 60%),
+    radial-gradient(800px 400px at 90% 110%, rgba(225,6,0,.07), transparent 60%);
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size:100% 3px;
+}
+.wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:16px 16px 48px}
+
+/* ============ SCOREBOARD HEADER ============ */
+.scoreboard{
+  background:linear-gradient(180deg,#11161E,#0C1017);
+  border:2px solid var(--line);
+  border-radius:14px;
+  padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);
+  margin-bottom:18px;
+}
+.sb-cell{text-align:center;min-width:70px}
+.sb-label{font-size:.62rem;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;font-weight:700}
+.sb-value{
+  font-family:'Anton',sans-serif;font-size:1.7rem;letter-spacing:.04em;
+  color:var(--amber);text-shadow:0 0 14px rgba(255,197,61,.55);
+  font-variant-numeric:tabular-nums;line-height:1.1;
+}
+.sb-value.streak-hot{color:#FF7A00;text-shadow:0 0 16px rgba(255,122,0,.7)}
+.sb-title{
+  font-family:'Anton',sans-serif;font-size:1.05rem;letter-spacing:.14em;color:var(--flood);
+  text-transform:uppercase;line-height:1.15;text-align:center;
+}
+.sb-title small{display:block;font-family:'Barlow Semi Condensed';font-weight:700;font-size:.58rem;letter-spacing:.3em;color:var(--amber)}
+.mute-btn{
+  background:var(--panel2);border:1px solid var(--line);color:var(--flood);
+  border-radius:10px;padding:8px 10px;cursor:pointer;font-size:1rem;line-height:1;
+  transition:transform .1s ease, border-color .2s;
+}
+.mute-btn:hover{border-color:var(--amber)}
+.mute-btn:active{transform:scale(.94)}
+.mute-btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+/* ============ SCREENS ============ */
+.screen{display:none;animation:screenIn .45s ease both}
+.screen.active{display:block}
+@keyframes screenIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ============ START ============ */
+.hero{
+  text-align:center;padding:38px 18px 30px;
+  background:linear-gradient(180deg,var(--panel),#10141B);
+  border:2px solid var(--line);border-radius:18px;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;inset:-40%;
+  background:conic-gradient(from 0deg, transparent 0 84%, rgba(255,197,61,.08) 92%, transparent 100%);
+  animation:sweep 7s linear infinite;
+}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.hero>*{position:relative}
+.hero-eyebrow{font-weight:800;font-size:.72rem;letter-spacing:.42em;color:var(--amber);text-transform:uppercase;margin-bottom:10px}
+.hero h1{
+  font-family:'Anton',sans-serif;
+  font-size:clamp(2.6rem,9vw,4.6rem);
+  letter-spacing:.03em;text-transform:uppercase;line-height:.95;
+}
+.hero h1 .glow{color:var(--amber);text-shadow:0 0 24px rgba(255,197,61,.55)}
+.hero-sub{margin-top:12px;color:var(--dim);font-size:1.02rem;font-weight:600}
+.sport-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:20px 0 8px}
+.tag{
+  font-size:.68rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:6px 12px;border-radius:999px;border:1px solid;
+}
+.rules{display:flex;justify-content:center;gap:26px;margin:20px 0 6px;flex-wrap:wrap}
+.rule{text-align:center}
+.rule b{display:block;font-family:'Anton';font-size:1.5rem;color:var(--flood);letter-spacing:.04em}
+.rule span{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.big-btn{
+  margin-top:22px;
+  font-family:'Anton',sans-serif;font-size:1.35rem;letter-spacing:.12em;text-transform:uppercase;
+  color:#141414;background:linear-gradient(180deg,#FFD86B,var(--amber-hot));
+  border:none;border-radius:12px;padding:16px 46px;cursor:pointer;
+  box-shadow:0 6px 0 #B87700, 0 14px 30px rgba(255,170,0,.35);
+  transition:transform .08s ease, box-shadow .08s ease;
+}
+.big-btn:hover{filter:brightness(1.05)}
+.big-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #B87700, 0 8px 18px rgba(255,170,0,.3)}
+.big-btn:focus-visible{outline:3px solid var(--flood);outline-offset:3px}
+
+/* ============ QUIZ ============ */
+.q-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.cat-badge{
+  font-weight:800;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:7px 14px;border-radius:8px;border:1.5px solid;display:inline-block;
+}
+.timer-wrap{position:relative;width:58px;height:58px;flex:none}
+.timer-wrap svg{transform:rotate(-90deg)}
+.timer-track{fill:none;stroke:var(--line);stroke-width:5}
+.timer-arc{fill:none;stroke:var(--green);stroke-width:5;stroke-linecap:round;transition:stroke .3s}
+.timer-num{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Anton';font-size:1.25rem;color:var(--flood);font-variant-numeric:tabular-nums;
+}
+.progress-rail{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:18px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--amber),#FF7A00);width:0%;transition:width .4s ease;border-radius:99px}
+.q-card{
+  background:linear-gradient(180deg,var(--panel),#11151D);
+  border:2px solid var(--line);border-radius:16px;padding:26px 24px;
+  box-shadow:0 12px 34px rgba(0,0,0,.45);
+}
+.q-num{font-size:.7rem;font-weight:800;letter-spacing:.3em;color:var(--amber);text-transform:uppercase;margin-bottom:10px}
+.q-text{
+  font-family:'Anton',sans-serif;font-size:clamp(1.25rem,3.6vw,1.75rem);
+  letter-spacing:.02em;line-height:1.3;margin-bottom:22px;
+}
+.answers{display:grid;gap:11px}
+@media(min-width:640px){.answers{grid-template-columns:1fr 1fr}}
+.ans-btn{
+  display:flex;align-items:center;gap:12px;text-align:left;
+  background:var(--panel2);border:2px solid var(--line);border-radius:12px;
+  padding:14px 16px;cursor:pointer;color:var(--flood);
+  font-family:'Barlow Semi Condensed';font-weight:700;font-size:1.02rem;line-height:1.3;
+  transition:border-color .15s, background .15s, transform .1s;
+}
+.ans-btn:hover:not(:disabled){border-color:var(--amber);background:#222B3A;transform:translateY(-2px)}
+.ans-btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.ans-key{
+  flex:none;width:30px;height:30px;border-radius:8px;background:var(--arena);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-family:'Anton';font-size:.95rem;color:var(--amber);
+}
+.ans-btn.correct{border-color:var(--green);background:rgba(61,220,132,.14);animation:popCorrect .4s ease}
+.ans-btn.correct .ans-key{background:var(--green);color:#08130C;border-color:var(--green)}
+.ans-btn.wrong{border-color:var(--red);background:rgba(255,71,87,.12);animation:shake .35s ease}
+.ans-btn.wrong .ans-key{background:var(--red);color:#fff;border-color:var(--red)}
+.ans-btn:disabled{cursor:default;opacity:.85}
+.ans-btn.faded{opacity:.35}
+@keyframes popCorrect{40%{transform:scale(1.035)}}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+/* lower-third verdict bar */
+.verdict{
+  margin-top:16px;border-radius:12px;overflow:hidden;display:none;
+  border:2px solid var(--line);
+}
+.verdict.show{display:flex;animation:lowerThird .35s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes lowerThird{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+.verdict-flag{
+  flex:none;display:flex;align-items:center;padding:12px 16px;
+  font-family:'Anton';letter-spacing:.12em;font-size:1rem;text-transform:uppercase;
+}
+.verdict.good .verdict-flag{background:var(--green);color:#08130C}
+.verdict.bad .verdict-flag{background:var(--red);color:#fff}
+.verdict-body{background:var(--panel2);padding:12px 16px;font-weight:600;color:var(--dim);flex:1;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.verdict-body b{color:var(--flood)}
+.pts{font-family:'Anton';color:var(--amber);font-size:1.1rem;letter-spacing:.06em;white-space:nowrap}
+.next-btn{
+  margin-top:16px;width:100%;
+  font-family:'Anton';font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--panel2);color:var(--flood);border:2px solid var(--amber);
+  border-radius:12px;padding:13px;cursor:pointer;display:none;
+  transition:background .15s, transform .1s;
+}
+.next-btn.show{display:block;animation:screenIn .3s ease both}
+.next-btn:hover{background:rgba(255,197,61,.12)}
+.next-btn:active{transform:scale(.985)}
+.next-btn:focus-visible{outline:2px solid var(--flood);outline-offset:2px}
+
+/* streak toast */
+.toast{
+  position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-90px);
+  background:linear-gradient(180deg,#FF9E2C,#FF6B00);color:#1A0E00;
+  font-family:'Anton';letter-spacing:.1em;font-size:1.05rem;text-transform:uppercase;
+  padding:12px 26px;border-radius:999px;z-index:50;
+  box-shadow:0 10px 30px rgba(255,122,0,.5);
+  transition:transform .35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ============ RESULTS ============ */
+.final{
+  text-align:center;padding:36px 20px;background:linear-gradient(180deg,var(--panel),#10141B);
+  border:2px solid var(--line);border-radius:18px;position:relative;overflow:hidden;
+}
+.final-eyebrow{font-weight:800;font-size:.7rem;letter-spacing:.4em;color:var(--amber);text-transform:uppercase}
+.final-grade{
+  font-family:'Anton';font-size:clamp(3rem,12vw,5.2rem);line-height:1;
+  color:var(--amber);text-shadow:0 0 30px rgba(255,197,61,.55);margin:10px 0 4px;
+}
+.final-title{font-family:'Anton';font-size:1.4rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.final-sub{color:var(--dim);font-weight:600;margin-bottom:22px}
+.final-stats{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:26px}
+.fstat b{display:block;font-family:'Anton';font-size:2rem;color:var(--flood)}
+.fstat span{font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.breakdown{max-width:520px;margin:0 auto 26px;text-align:left;display:grid;gap:9px}
+.bd-row{display:flex;align-items:center;gap:10px}
+.bd-name{flex:none;width:132px;font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.bd-rail{flex:1;height:10px;background:var(--line);border-radius:99px;overflow:hidden}
+.bd-fill{height:100%;border-radius:99px;width:0%;transition:width .9s cubic-bezier(.2,.8,.3,1)}
+.bd-score{flex:none;width:44px;text-align:right;font-family:'Anton';font-size:.95rem;color:var(--dim)}
+.confetti{position:absolute;top:-10px;width:10px;height:16px;opacity:.9;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(115vh) rotate(720deg);opacity:.7}}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001s !important;transition-duration:.001s !important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- SCOREBOARD -->
+  <header class="scoreboard" aria-label="Scoreboard">
+    <div class="sb-cell">
+      <div class="sb-label">Score</div>
+      <div class="sb-value" id="sbScore">0</div>
+    </div>
+    <div class="sb-title">Hoops Havoc<small>20-Question Basketball Challenge</small></div>
+    <div class="sb-cell">
+      <div class="sb-label">Streak</div>
+      <div class="sb-value" id="sbStreak">0</div>
+    </div>
+    <button class="mute-btn" id="muteBtn" aria-label="Toggle sound">🔊</button>
+  </header>
+
+  <!-- START SCREEN -->
+  <section class="screen active" id="startScreen">
+    <div class="hero">
+      <div class="hero-eyebrow">Live from the arena</div>
+      <h1>Hoops<br><span class="glow">Havoc</span></h1>
+      <p class="hero-sub">20 questions. NBA and March Madness. One shot at the title.</p>
+      <div class="sport-tags" id="tagRow"></div>
+      <div class="rules">
+        <div class="rule"><b>20</b><span>Questions</span></div>
+        <div class="rule"><b>20s</b><span>Per question</span></div>
+        <div class="rule"><b>+50</b><span>Streak bonus</span></div>
+      </div>
+      <button class="big-btn" id="startBtn">▶ Start the Show</button>
+    </div>
+  </section>
+
+  <!-- QUIZ SCREEN -->
+  <section class="screen" id="quizScreen">
+    <div class="q-top">
+      <span class="cat-badge" id="catBadge">CATEGORY</span>
+      <div class="timer-wrap" aria-hidden="true">
+        <svg width="58" height="58" viewBox="0 0 58 58">
+          <circle class="timer-track" cx="29" cy="29" r="25"></circle>
+          <circle class="timer-arc" id="timerArc" cx="29" cy="29" r="25"></circle>
+        </svg>
+        <div class="timer-num" id="timerNum">20</div>
+      </div>
+    </div>
+    <div class="progress-rail"><div class="progress-fill" id="progFill"></div></div>
+    <div class="q-card">
+      <div class="q-num" id="qNum">Question 1 of 50</div>
+      <div class="q-text" id="qText"></div>
+      <div class="answers" id="answers"></div>
+      <div class="verdict" id="verdict">
+        <div class="verdict-flag" id="verdictFlag"></div>
+        <div class="verdict-body"><span id="verdictText"></span><span class="pts" id="verdictPts"></span></div>
+      </div>
+      <button class="next-btn" id="nextBtn">Next Question ▶</button>
+    </div>
+  </section>
+
+  <!-- RESULTS SCREEN -->
+  <section class="screen" id="endScreen">
+    <div class="final" id="finalCard">
+      <div class="final-eyebrow">Final Whistle</div>
+      <div class="final-grade" id="finalGrade">A+</div>
+      <div class="final-title" id="finalTitle"></div>
+      <div class="final-sub" id="finalSub"></div>
+      <div class="final-stats">
+        <div class="fstat"><b id="fScore">0</b><span>Points</span></div>
+        <div class="fstat"><b id="fCorrect">0/50</b><span>Correct</span></div>
+        <div class="fstat"><b id="fBest">0</b><span>Best streak</span></div>
+      </div>
+      <div class="breakdown" id="breakdown"></div>
+      <button class="big-btn" id="againBtn">↻ Play Again</button>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast">🔥 Streak!</div>
+
+<script>
+/* =====================================================
+   QUESTION BANK — 50 questions across 7 sports
+===================================================== */
+const CATS = {
+  nba:    {name:"NBA",                color:"#FF7A00"},
+  cbb:    {name:"College Basketball", color:"#1FA7A0"},
+};
+
+const QUESTIONS = [
+{c:"nba", q:"Who is the NBA's all-time leading scorer in regular-season points?",
+ a:["Kareem Abdul-Jabbar","Michael Jordan","LeBron James","Karl Malone"], k:2,
+ x:"LeBron passed Kareem's long-standing record in February 2023."},
+{c:"nba", q:"Which franchise holds the most NBA championships with 18 titles?",
+ a:["Los Angeles Lakers","Boston Celtics","Chicago Bulls","Golden State Warriors"], k:1,
+ x:"Boston broke its tie with the Lakers by winning banner 18 in 2024."},
+{c:"nba", q:"Who scored an NBA-record 100 points in a single game in 1962?",
+ a:["Wilt Chamberlain","Elgin Baylor","Oscar Robertson","Jerry West"], k:0,
+ x:"Wilt dropped 100 for Philadelphia against the Knicks in Hershey, PA."},
+{c:"nba", q:"Michael Jordan won how many NBA championships — all with the Chicago Bulls?",
+ a:["4","5","6","7"], k:2,
+ x:"Two three-peats: 1991–93 and 1996–98, with six Finals MVPs."},
+{c:"nba", q:"The fast-breaking 1980s Lakers dynasty was known by what nickname?",
+ a:["Run TMC","Showtime","The Bad Boys","Lob City"], k:1,
+ x:"Magic Johnson's Lakers turned the Forum into 'Showtime.'"},
+{c:"nba", q:"How many seconds does an NBA team have to attempt a shot?",
+ a:["24","30","35","20"], k:0,
+ x:"The 24-second shot clock was introduced in 1954 and saved the sport."},
+{c:"nba", q:"Which Celtics legend won a record 11 NBA championships as a player?",
+ a:["Larry Bird","John Havlicek","Bob Cousy","Bill Russell"], k:3,
+ x:"Russell won 11 titles in 13 seasons — the most in league history."},
+{c:"nba", q:"Kareem Abdul-Jabbar's virtually unstoppable signature shot was called what?",
+ a:["The fadeaway", "The teardrop", "The skyhook", "The Dream Shake"], k:2,
+ x:"The skyhook carried Kareem to six MVPs and six titles."},
+{c:"nba", q:"Which team set the NBA record with 73 regular-season wins in 2015-16?",
+ a:["Chicago Bulls", "Golden State Warriors", "San Antonio Spurs", "Los Angeles Lakers"], k:1,
+ x:"The Warriors broke the 1996 Bulls' 72-win record."},
+{c:"nba", q:"Reaching double digits in three statistical categories in one game is called what?",
+ a:["A hat trick", "A trifecta", "A three-peat", "A triple-double"], k:3,
+ x:"Points, rebounds, and assists is the classic triple-double combination."},
+{c:"cbb", q:"How many teams make the modern NCAA men's basketball tournament field?",
+ a:["64","65","68","72"], k:2,
+ x:"The field expanded to 68 teams with the 'First Four' in 2011."},
+{c:"cbb", q:"Which program has won the most NCAA men's basketball championships with 11?",
+ a:["Kentucky","UCLA","North Carolina","Duke"], k:1,
+ x:"UCLA's 11 titles lead the men's record book."},
+{c:"cbb", q:"Which legendary coach won 10 national titles at UCLA, including seven in a row?",
+ a:["John Wooden","Dean Smith","Bob Knight","Adolph Rupp"], k:0,
+ x:"The 'Wizard of Westwood' built the greatest dynasty in college sports."},
+{c:"cbb", q:"A low-seeded team making a deep March Madness run is famously called what?",
+ a:["A dark horse","A Cinderella","A sleeper","A bracket buster"], k:1,
+ x:"Cinderella stories are the heartbeat of the NCAA tournament."},
+{c:"cbb", q:"Mike Krzyzewski, the winningest coach in men's Division I history, led which program?",
+ a:["Kansas","Michigan State","Duke","Villanova"], k:2,
+ x:"'Coach K' won five national titles across four decades at Duke."},
+{c:"cbb", q:"What is the name for the last two rounds of the NCAA tournament, held at one site?",
+ a:["The Elite Eight","The Championship Weekend","The Final Four","The Big Dance"], k:2,
+ x:"The Final Four is one of the biggest weekends in American sports."},
+{c:"cbb", q:"The famous 1979 NCAA final that launched a legendary NBA rivalry featured which two stars?",
+ a:["Magic Johnson & Larry Bird","Michael Jordan & Patrick Ewing","Isiah Thomas & James Worthy","Kareem & Bill Walton"], k:0,
+ x:"Magic's Michigan State beat Bird's Indiana State in the highest-rated final ever."},
+{c:"cbb", q:"In 1985, which 8-seed shocked Georgetown to win the national championship?",
+ a:["NC State", "Indiana", "Villanova", "Kansas"], k:2,
+ x:"Villanova shot nearly 79% from the field in 'The Perfect Game.'"},
+{c:"cbb", q:"In 2018, UMBC became the first 16-seed ever to beat a 1-seed, stunning which team?",
+ a:["Duke", "Virginia", "Gonzaga", "Kentucky"], k:1,
+ x:"Virginia recovered to win the national title the very next year."},
+{c:"cbb", q:"Christian Laettner's famous 1992 buzzer-beater against Kentucky came for which school?",
+ a:["North Carolina", "Michigan", "Indiana", "Duke"], k:3,
+ x:"'The Shot' capped one of the greatest games in tournament history."},
+];
+
+/* =====================================================
+   AUDIO ENGINE — Web Audio API (all sounds synthesized)
+===================================================== */
+const AudioEngine = (() => {
+  let ctx = null, muted = false, themeTimer = null, tickOsc = null;
+  const music = {gain:null};
+
+  function ac(){
+    if(!ctx) ctx = new (window.AudioContext||window.webkitAudioContext)();
+    if(ctx.state === "suspended") ctx.resume();
+    return ctx;
+  }
+  function blip(freq, t0, dur, type="square", vol=0.15, dest){
+    const c = ac();
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(vol, t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    o.connect(g); g.connect(dest||c.destination);
+    o.start(t0); o.stop(t0+dur+0.02);
+  }
+  /* --- Theme song: bouncy game-show loop --- */
+  function startTheme(){
+    if(muted) return;
+    stopTheme();
+    const c = ac();
+    music.gain = c.createGain();
+    music.gain.gain.value = 0.5;
+    music.gain.connect(c.destination);
+    const bpm = 132, beat = 60/bpm;
+    // bass line + melody, 8-beat loop
+    const bass   = [110,110,146.83,110, 98,98,130.81,123.47];
+    const melody = [440,523.25,659.25,523.25, 587.33,493.88,523.25,659.25];
+    const loop = () => {
+      if(muted || !music.gain) return;
+      const t0 = c.currentTime + 0.03;
+      for(let i=0;i<8;i++){
+        blip(bass[i],   t0 + i*beat,        beat*0.85, "triangle", 0.20, music.gain);
+        blip(melody[i], t0 + i*beat,        beat*0.42, "square",   0.055, music.gain);
+        // off-beat hat-like click
+        blip(2400,      t0 + i*beat + beat/2, 0.045,   "square",   0.02,  music.gain);
+      }
+    };
+    loop();
+    themeTimer = setInterval(loop, (60/bpm)*8*1000);
+  }
+  function stopTheme(){
+    if(themeTimer){ clearInterval(themeTimer); themeTimer = null; }
+    if(music.gain){ try{ music.gain.disconnect(); }catch(e){} music.gain = null; }
+  }
+  /* --- SFX --- */
+  function sfxCorrect(){
+    if(muted) return;
+    const c = ac(), t = c.currentTime;
+    [523.25, 659.25, 783.99, 1046.5].forEach((f,i)=> blip(f, t+i*0.07, 0.22, "square", 0.14));
+  }
+  function sfxWrong(){
+    if(muted) return;
+    const c = ac(), t = c.currentTime;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = "sawtooth";
+    o.frequency.setValueAtTime(220, t);
+    o.frequency.exponentialRampToValueAtTime(82, t+0.5);
+    g.gain.setValueAtTime(0.16, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+0.55);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t+0.6);
+  }
+  function sfxTick(){
+    if(muted) return;
+    blip(1200, ac().currentTime, 0.05, "square", 0.07);
+  }
+  function sfxAdvance(){
+    if(muted) return;
+    const t = ac().currentTime;
+    blip(660, t, 0.09, "square", 0.09);
+    blip(880, t+0.08, 0.11, "square", 0.09);
+  }
+  function sfxStreak(){
+    if(muted) return;
+    const t = ac().currentTime;
+    [659.25, 830.61, 987.77, 1318.5].forEach((f,i)=> blip(f, t+i*0.06, 0.18, "triangle", 0.13));
+  }
+  function sfxFanfare(){
+    if(muted) return;
+    const c = ac(), t = c.currentTime;
+    const seq = [ [523.25,0,.25],[523.25,.22,.25],[523.25,.44,.25],[659.25,.66,.5],
+                  [587.33,1.05,.25],[659.25,1.27,.7],[783.99,1.27,.7],[1046.5,1.27,.9] ];
+    seq.forEach(([f,d,len])=>{
+      blip(f, t+d, len, "square", 0.12);
+      blip(f/2, t+d, len, "triangle", 0.10);
+    });
+  }
+  function toggleMute(){
+    muted = !muted;
+    if(muted) stopTheme();
+    return muted;
+  }
+  return {startTheme, stopTheme, sfxCorrect, sfxWrong, sfxTick, sfxAdvance, sfxStreak, sfxFanfare, toggleMute, get muted(){return muted;}};
+})();
+
+/* =====================================================
+   GAME STATE + FLOW
+===================================================== */
+const TIME_LIMIT = 20;
+const state = {order:[], idx:0, score:0, streak:0, bestStreak:0, correct:0,
+               perCat:{}, timer:null, timeLeft:TIME_LIMIT, locked:false};
+
+const $ = id => document.getElementById(id);
+const screens = {start:$("startScreen"), quiz:$("quizScreen"), end:$("endScreen")};
+const ARC_LEN = 2*Math.PI*25;
+$("timerArc").style.strokeDasharray = ARC_LEN;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function showScreen(name){
+  Object.values(screens).forEach(s=>s.classList.remove("active"));
+  screens[name].classList.add("active");
+}
+function updateScoreboard(){
+  $("sbScore").textContent = state.score;
+  const st = $("sbStreak");
+  st.textContent = state.streak;
+  st.classList.toggle("streak-hot", state.streak >= 3);
+}
+
+/* --- start screen tags --- */
+(function buildTags(){
+  const row = $("tagRow");
+  Object.values(CATS).forEach(cat=>{
+    const t = document.createElement("span");
+    t.className = "tag";
+    t.textContent = cat.name;
+    t.style.color = cat.color;
+    t.style.borderColor = cat.color + "88";
+    t.style.background = cat.color + "14";
+    row.appendChild(t);
+  });
+})();
+
+function startGame(){
+  state.order = shuffle(QUESTIONS);
+  state.idx = 0; state.score = 0; state.streak = 0; state.bestStreak = 0; state.correct = 0;
+  state.perCat = {};
+  Object.keys(CATS).forEach(c=> state.perCat[c] = {right:0,total:0});
+  updateScoreboard();
+  AudioEngine.startTheme();
+  showScreen("quiz");
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = state.order[state.idx];
+  state.locked = false;
+  const cat = CATS[q.c];
+
+  const badge = $("catBadge");
+  badge.textContent = cat.name;
+  badge.style.color = cat.color;
+  badge.style.borderColor = cat.color;
+  badge.style.background = cat.color + "1A";
+
+  $("qNum").textContent = `Question ${state.idx+1} of ${state.order.length}`;
+  $("qText").textContent = q.q;
+  $("progFill").style.width = (state.idx/state.order.length*100) + "%";
+
+  // shuffle answer positions
+  const idxs = shuffle(q.a.map((_,i)=>i));
+  const box = $("answers");
+  box.innerHTML = "";
+  const keys = ["A","B","C","D"];
+  idxs.forEach((origIdx,pos)=>{
+    const b = document.createElement("button");
+    b.className = "ans-btn";
+    b.innerHTML = `<span class="ans-key">${keys[pos]}</span><span>${q.a[origIdx]}</span>`;
+    b.dataset.orig = origIdx;
+    b.addEventListener("click", ()=> answer(b, origIdx));
+    box.appendChild(b);
+  });
+
+  $("verdict").className = "verdict";
+  $("nextBtn").classList.remove("show");
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(state.timer);
+  state.timeLeft = TIME_LIMIT;
+  paintTimer();
+  state.timer = setInterval(()=>{
+    state.timeLeft--;
+    paintTimer();
+    if(state.timeLeft <= 5 && state.timeLeft > 0) AudioEngine.sfxTick();
+    if(state.timeLeft <= 0){
+      clearInterval(state.timer);
+      timeOut();
+    }
+  }, 1000);
+}
+function paintTimer(){
+  $("timerNum").textContent = state.timeLeft;
+  const frac = state.timeLeft / TIME_LIMIT;
+  const arc = $("timerArc");
+  arc.style.strokeDashoffset = ARC_LEN * (1 - frac);
+  arc.style.stroke = frac > 0.5 ? "var(--green)" : frac > 0.25 ? "var(--amber)" : "var(--red)";
+}
+
+function lockButtons(){
+  document.querySelectorAll(".ans-btn").forEach(b=> b.disabled = true);
+}
+
+function answer(btn, chosen){
+  if(state.locked) return;
+  state.locked = true;
+  clearInterval(state.timer);
+  const q = state.order[state.idx];
+  state.perCat[q.c].total++;
+  lockButtons();
+
+  const isRight = chosen === q.k;
+  document.querySelectorAll(".ans-btn").forEach(b=>{
+    const o = +b.dataset.orig;
+    if(o === q.k) b.classList.add("correct");
+    else if(o === chosen && !isRight) b.classList.add("wrong");
+    else b.classList.add("faded");
+  });
+
+  let pts = 0;
+  if(isRight){
+    state.correct++;
+    state.perCat[q.c].right++;
+    state.streak++;
+    state.bestStreak = Math.max(state.bestStreak, state.streak);
+    pts = 100 + state.timeLeft*5 + (state.streak >= 3 ? 50 : 0);
+    state.score += pts;
+    AudioEngine.sfxCorrect();
+    if(state.streak >= 3 && state.streak % 3 === 0){
+      AudioEngine.sfxStreak();
+      showToast(`🔥 ${state.streak} in a row!`);
+    }
+  } else {
+    state.streak = 0;
+    AudioEngine.sfxWrong();
+  }
+  updateScoreboard();
+  showVerdict(isRight, q, pts, false);
+}
+
+function timeOut(){
+  if(state.locked) return;
+  state.locked = true;
+  const q = state.order[state.idx];
+  state.perCat[q.c].total++;
+  state.streak = 0;
+  lockButtons();
+  document.querySelectorAll(".ans-btn").forEach(b=>{
+    if(+b.dataset.orig === q.k) b.classList.add("correct");
+    else b.classList.add("faded");
+  });
+  AudioEngine.sfxWrong();
+  updateScoreboard();
+  showVerdict(false, q, 0, true);
+}
+
+function showVerdict(good, q, pts, timedOut){
+  const v = $("verdict");
+  v.className = "verdict show " + (good ? "good":"bad");
+  $("verdictFlag").textContent = good ? "Correct!" : (timedOut ? "Time's Up!" : "Wrong!");
+  $("verdictText").innerHTML = q.x ? q.x : `The answer was <b>${q.a[q.k]}</b>.`;
+  $("verdictPts").textContent = good ? `+${pts} pts` : "+0 pts";
+  $("nextBtn").textContent = state.idx === state.order.length-1 ? "See Final Results ▶" : "Next Question ▶";
+  $("nextBtn").classList.add("show");
+}
+
+function showToast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=> t.classList.remove("show"), 1600);
+}
+
+$("nextBtn").addEventListener("click", ()=>{
+  AudioEngine.sfxAdvance();
+  state.idx++;
+  if(state.idx >= state.order.length) endGame();
+  else renderQuestion();
+});
+
+/* keyboard: A–D / 1–4 to answer, Enter/Space for next */
+document.addEventListener("keydown",(e)=>{
+  if(!screens.quiz.classList.contains("active")) return;
+  if(!state.locked){
+    const map = {a:0,b:1,c:2,d:3,"1":0,"2":1,"3":2,"4":3};
+    const pos = map[e.key.toLowerCase()];
+    if(pos !== undefined){
+      const btns = document.querySelectorAll(".ans-btn");
+      if(btns[pos]) btns[pos].click();
+    }
+  } else if(e.key === "Enter" || e.key === " "){
+    e.preventDefault();
+    $("nextBtn").click();
+  }
+});
+
+/* --- results --- */
+function endGame(){
+  AudioEngine.stopTheme();
+  showScreen("end");
+  AudioEngine.sfxFanfare();
+
+  const pct = state.correct / state.order.length;
+  let grade, title, sub;
+  if(pct >= 0.9){ grade="🏆 MVP"; title="Champion Status"; sub="You just ran the table. Hang the banner."; }
+  else if(pct >= 0.75){ grade="A"; title="All-Star Performance"; sub="Elite knowledge across the board."; }
+  else if(pct >= 0.6){ grade="B"; title="Solid Starter"; sub="Strong showing — a few film sessions from greatness."; }
+  else if(pct >= 0.4){ grade="C"; title="Role Player"; sub="You've got flashes. Hit the practice facility."; }
+  else { grade="D"; title="Rebuilding Year"; sub="Every dynasty starts somewhere. Run it back."; }
+
+  $("finalGrade").textContent = grade;
+  $("finalTitle").textContent = title;
+  $("finalSub").textContent = sub;
+  $("fScore").textContent = state.score.toLocaleString();
+  $("fCorrect").textContent = `${state.correct}/${state.order.length}`;
+  $("fBest").textContent = state.bestStreak;
+
+  const bd = $("breakdown");
+  bd.innerHTML = "";
+  Object.entries(CATS).forEach(([key,cat])=>{
+    const s = state.perCat[key];
+    const row = document.createElement("div");
+    row.className = "bd-row";
+    row.innerHTML = `
+      <span class="bd-name" style="color:${cat.color}">${cat.name}</span>
+      <div class="bd-rail"><div class="bd-fill" style="background:${cat.color}"></div></div>
+      <span class="bd-score">${s.right}/${s.total}</span>`;
+    bd.appendChild(row);
+    requestAnimationFrame(()=> requestAnimationFrame(()=>{
+      row.querySelector(".bd-fill").style.width = (s.total ? s.right/s.total*100 : 0) + "%";
+    }));
+  });
+
+  if(pct >= 0.6) confetti();
+}
+
+function confetti(){
+  const card = $("finalCard");
+  const colors = Object.values(CATS).map(c=>c.color).concat(["#FFC53D","#F4F1E6"]);
+  for(let i=0;i<70;i++){
+    const p = document.createElement("div");
+    p.className = "confetti";
+    p.style.left = Math.random()*100 + "%";
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDuration = (2.4 + Math.random()*2.2) + "s";
+    p.style.animationDelay = (Math.random()*1.2) + "s";
+    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    card.appendChild(p);
+    setTimeout(()=> p.remove(), 6000);
+  }
+}
+
+/* --- controls --- */
+$("startBtn").addEventListener("click", startGame);
+$("againBtn").addEventListener("click", startGame);
+$("muteBtn").addEventListener("click", ()=>{
+  const m = AudioEngine.toggleMute();
+  $("muteBtn").textContent = m ? "🔇" : "🔊";
+  $("muteBtn").setAttribute("aria-label", m ? "Unmute sound" : "Mute sound");
+  if(!m && screens.quiz.classList.contains("active")) AudioEngine.startTheme();
+});
+</script>
+</body>
+</html>
